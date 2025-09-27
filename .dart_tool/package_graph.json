@@ -16,6 +16,7 @@
         "flutter_hooks",
         "flutter_html",
         "flutter_phoenix",
+        "flutter_staggered_grid_view",
         "flutter_svg",
         "fluttertoast",
         "freezed_annotation",
@@ -24,10 +25,12 @@
         "hive_flutter",
         "http",
         "icons_launcher",
+        "icons_plus",
         "image_picker",
         "in_app_update",
         "intl",
         "json_annotation",
+        "material_design_icons_flutter",
         "onesignal_flutter",
         "package_info_plus",
         "phonepe_payment_sdk",
@@ -151,6 +154,28 @@
         "test_api",
         "vector_math",
         "vm_service"
+      ]
+    },
+    {
+      "name": "flutter_staggered_grid_view",
+      "version": "0.7.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "material_design_icons_flutter",
+      "version": "7.0.7296",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "icons_plus",
+      "version": "5.0.0",
+      "dependencies": [
+        "flutter",
+        "flutter_svg"
       ]
     },
     {

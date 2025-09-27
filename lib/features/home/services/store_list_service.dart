@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:rajakumari_scheme/core/config/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:rajakumari_scheme/core/api_secrets/api_secrets.dart';
-import 'package:rajakumari_scheme/core/services/auth_state_service.dart';
 import 'package:rajakumari_scheme/features/home/models/store_model.dart';
 
 class StoreListService {

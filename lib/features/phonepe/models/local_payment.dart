@@ -64,7 +64,7 @@ class LocalPayment {
         passbookId: json['passbookId']?.toString(),
         uniqId: json['uniqId']?.toString(),
         timestamp: parsedTimestamp,
-        status: json['status']?.toString()?.toLowerCase() ?? 'pending',
+        status: json['status']?.toString().toLowerCase() ?? 'pending',
       );
     } catch (e) {
     

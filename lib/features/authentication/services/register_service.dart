@@ -93,5 +93,6 @@ class RegisterService {
     } catch (e) {
       throw e.toString();
     }
+    return null;
   }
 }

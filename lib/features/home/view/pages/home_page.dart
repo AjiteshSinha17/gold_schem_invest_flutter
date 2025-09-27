@@ -1,8 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:feather_icons/feather_icons.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rajakumari_scheme/core/controllers/store_list_controller.dart';
+import 'package:rajakumari_scheme/core/constants/global_colors.dart';
 import 'package:rajakumari_scheme/core/models/coredata_model.dart';
 import 'package:rajakumari_scheme/core/services/auth_state_service.dart';
 import 'package:rajakumari_scheme/features/contact/view/pages/contact_page.dart';
@@ -19,167 +20,210 @@ class HomePage extends StatelessWidget {
 
   const HomePage({super.key, this.coreData});
 
-  // final VoidCallback? onStoresTap;
-
   @override
   Widget build(BuildContext context) {
     final AuthStateService authStateService = AuthStateService();
     final isCompact = MediaQuery.of(context).size.width < 320;
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          children: [
-            if (coreData?.minLogo != null && coreData!.minLogo.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Image.network(
-                  'https://rajakumarischeme.com/admin/${coreData!.minLogo}',
-                  height: 32,
-                  errorBuilder:
-                      (context, error, stackTrace) =>
-                          const SizedBox(width: 32, height: 32),
-                ),
-              ),
-            Text(
-              coreData?.siteTitle ?? 'Rajakumari',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: isCompact ? 14 : 16,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color.fromARGB(255, 242, 252, 246),
+              Colors.white,
+            ],
+          ),
         ),
-        actions: [
-          authStateService.isLoggedIn && authStateService.userId.isNotEmpty
-              ? IconButton(
-                icon: const Icon(FeatherIcons.bell, color: Colors.black),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                      opaque: false,
-                      pageBuilder:
-                          (_, __, ___) => NotificationDrawer(
-                            userId: authStateService.userId,
-                          ),
-                      transitionsBuilder: (_, animation, __, child) {
-                        const begin = Offset(1.0, 0.0);
-                        const end = Offset.zero;
-                        const curve = Curves.easeInOut;
-
-                        var tween = Tween(
-                          begin: begin,
-                          end: end,
-                        ).chain(CurveTween(curve: curve));
-                        return SlideTransition(
-                          position: animation.drive(tween),
-                          child: child,
-                        );
-                      },
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              backgroundColor: const Color(0xFFD4A017),
+              elevation: 2,
+              pinned: true,
+              title: Row(
+                children: [
+                  if (coreData?.minLogo != null && coreData!.minLogo.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Image.network(
+                        'https://rajakumarischeme.com/admin/${coreData!.minLogo}',
+                        height: 34,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox(width: 32, height: 32),
+                      ),
                     ),
-                  );
-                },
-              )
-              : SizedBox(),
-        ],
-      ),
-      body: ListView(
-        children: [
-          //!============ Banner  =================
-          const BannerWidget(),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  Text(
+                    coreData?.siteTitle ?? 'Gold Scheme',
+                    style: TextStyle(
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                      fontWeight: FontWeight.bold,
+                      fontSize: isCompact ? 20 : 22,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              actions: [
+                authStateService.isLoggedIn &&
+                        authStateService.userId.isNotEmpty
+                    ? IconButton(
+                        icon:  Icon(MdiIcons.bellOutline, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              opaque: false,
+                              pageBuilder: (_, __, ___) => NotificationDrawer(
+                                userId: authStateService.userId,
+                              ),
+                              transitionsBuilder: (_, animation, __, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOut;
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      )
+                    : const SizedBox(),
+              ],
+            ),
 
-            child: Column(
-              children: [
-                //!============ Gold Rate Card  =================
-                GoldCardWidget(),
-                const SizedBox(height: 24),
-                //!============ Services Grid  =================
+            SliverList(
+              delegate: SliverChildListDelegate([
+                const SizedBox(height: 8),
+                const BannerWidget(),
+                const SizedBox(height: 16),
+
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: const BorderSide(
+                      color: Color(0xFFD4A017),
+                      width: 1.5,
+                    ),
+                  ),
+                  elevation: 6,
+                  shadowColor: AppColors.primaryGold.withOpacity(0.4),
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              MdiIcons.pin,
+                              size: 20,
+                              color: const Color.fromARGB(255, 255, 0, 0),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text(
+                              "Total Gold Rate",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFD4A017),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        GoldCardWidget(),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    int crossAxisCount = constraints.maxWidth < 600 ? 3 : 4;
+                    int crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
 
-                    return GridView.count(
-                      crossAxisCount: crossAxisCount,
+                    final List<Map<String, dynamic>> services = [
+                      {
+                        "icon": MdiIcons.gold,
+                        "color": Colors.amber[800],
+                        "label": "Gold Rate",
+                        "page": const GoldRatePage(),
+                      },
+                      {
+                        "icon": MdiIcons.storefrontOutline,
+                        "color": Colors.deepPurple,
+                        "label": "Stores",
+                        "page": const StoresPage(),
+                      },
+                      {
+                        "icon": MdiIcons.bookOpenPageVariantOutline,
+                        "color": Colors.blueAccent,
+                        "label": "Schemes",
+                        "page": EasygoldInfoPage(),
+                      },
+                      {
+                        "icon": MdiIcons.phoneClassic,
+                        "color": Colors.green,
+                        "label": "Contact",
+                        "page": ContactPage(coreData: coreData),
+                      },
+                      {
+                        "icon": MdiIcons.calendarPlus,
+                        "color": Colors.redAccent,
+                        "label": "Schedule Visit",
+                        "page": const ScheduleVisitPage(),
+                      },
+                    ];
+
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1,
+                      ),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      children: [
-                        _ServiceIcon(
-                          icon: FeatherIcons.trendingUp,
-                          label: 'Gold Rate',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const GoldRatePage(),
-                              ),
-                            );
+                      itemCount: services.length,
+                      itemBuilder: (context, index) {
+                        return TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0, end: 1),
+                          duration: Duration(milliseconds: 300 + (index * 80)),
+                          curve: Curves.easeOutCubic,
+                          builder: (context, value, child) {
+                            return Transform.scale(scale: value, child: child);
                           },
-                        ),
-                        _ServiceIcon(
-                          icon: FeatherIcons.mapPin,
-                          label: 'Stores',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const StoresPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _ServiceIcon(
-                          icon: FeatherIcons.star,
-                          label: 'Schemes',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => EasygoldInfoPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        _ServiceIcon(
-                          icon: FeatherIcons.phone,
-                          label: 'Contact',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ContactPage(coreData: coreData),
-                              ),
-                            );
-                          },
-                        ),
-                        _ServiceIcon(
-                          icon: FeatherIcons.calendar,
-                          label: 'Schedule Visit',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const ScheduleVisitPage(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                          child: _ServiceIcon(
+                            icon: services[index]["icon"],
+                            color: services[index]["color"],
+                            label: services[index]["label"],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => services[index]["page"],
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
-              ],
+                const SizedBox(height: 20),
+              ]),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -187,10 +231,16 @@ class HomePage extends StatelessWidget {
 
 class _ServiceIcon extends StatefulWidget {
   final IconData icon;
+  final Color? color;
   final String label;
   final Function()? onTap;
 
-  const _ServiceIcon({required this.icon, required this.label, this.onTap});
+  const _ServiceIcon({
+    required this.icon,
+    this.color,
+    required this.label,
+    this.onTap,
+  });
 
   @override
   State<_ServiceIcon> createState() => _ServiceIconState();
@@ -199,17 +249,8 @@ class _ServiceIcon extends StatefulWidget {
 class _ServiceIconState extends State<_ServiceIcon> {
   double _elevation = 2;
 
-  void _onTapDown(_) {
-    setState(() {
-      _elevation = 8;
-    });
-  }
-
-  void _onTapUp(_) {
-    setState(() {
-      _elevation = 2;
-    });
-  }
+  void _onTapDown(_) => setState(() => _elevation = 6);
+  void _onTapUp(_) => setState(() => _elevation = 2);
 
   @override
   Widget build(BuildContext context) {
@@ -221,57 +262,49 @@ class _ServiceIconState extends State<_ServiceIcon> {
       onTapUp: _onTapUp,
       onTapCancel: () => setState(() => _elevation = 2),
       child: AnimatedPhysicalModel(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         elevation: _elevation,
-        color: Colors.white.withOpacity(0.6),
-        shadowColor: Colors.amber.shade800,
-        borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
+        color: Colors.transparent,
+        shadowColor: AppColors.primaryGold.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(isCompact ? 14 : 18),
         shape: BoxShape.rectangle,
         child: Container(
-          width: isCompact ? 40 : 90,
-          height: isCompact ? 60 : 120,
-          padding: EdgeInsets.symmetric(
-            horizontal: isCompact ? 2 : 8,
-            vertical: isCompact ? 2 : 4,
-          ),
-
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [Color(0xFFFFF8E1), Colors.amber.shade100],
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFF7E27E),
+                Color(0xFFB0BEC5),
+              ],
             ),
-            borderRadius: BorderRadius.circular(isCompact ? 12 : 16),
-            border: Border.all(color: Colors.amber.withOpacity(0.5), width: 1),
+            borderRadius: BorderRadius.circular(isCompact ? 14 : 18),
+            border: Border.all(
+              color: const Color(0xFFD4A017),
+              width: 1.3,
+            ),
           ),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  padding: EdgeInsets.all(isCompact ? 8 : 10),
-                  child: Icon(
-                    widget.icon,
-                    size: isCompact ? 12 : 18,
-                    color: Colors.amber.shade800,
-                  ),
+                Icon(
+                  widget.icon,
+                  size: isCompact ? 30 : 36,
+                  color: widget.color ?? AppColors.primaryGold,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   widget.label,
                   style: TextStyle(
-                    fontSize: isCompact ? 10 : 12,
-                    fontWeight: FontWeight.w600,
+                    fontSize: isCompact ? 14 : 16,
+                    fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
-                  overflow: TextOverflow.clip,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

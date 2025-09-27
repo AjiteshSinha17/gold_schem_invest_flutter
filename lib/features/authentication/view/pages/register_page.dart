@@ -246,7 +246,6 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       showGlassAlert(context, e.toString(), AlertStatus.error);
     } finally {
-      ;
       if (mounted) {
         setState(() {
           _isLoading = false;

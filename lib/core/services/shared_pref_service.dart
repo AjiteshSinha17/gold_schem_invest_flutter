@@ -149,29 +149,39 @@ class SharedPrefService {
         _userData: jsonString,
       };
       // Optional fields
-      if (userData['address_1'] != null)
+      if (userData['address_1'] != null) {
         flatData[_address1] = userData['address_1'];
-      if (userData['address_2'] != null)
+      }
+      if (userData['address_2'] != null) {
         flatData[_address2] = userData['address_2'];
-      if (userData['landmark'] != null)
+      }
+      if (userData['landmark'] != null) {
         flatData[_landmark] = userData['landmark'];
+      }
       if (userData['state'] != null) flatData[_state] = userData['state'];
-      if (userData['district'] != null)
+      if (userData['district'] != null) {
         flatData[_district] = userData['district'];
+      }
       if (userData['pincode'] != null) flatData[_pincode] = userData['pincode'];
       if (userData['pan_no'] != null) flatData[_panNo] = userData['pan_no'];
-      if (userData['pan_image'] != null)
+      if (userData['pan_image'] != null) {
         flatData[_panImage] = userData['pan_image'];
-      if (userData['aadhar_no'] != null)
+      }
+      if (userData['aadhar_no'] != null) {
         flatData[_aadharNo] = userData['aadhar_no'];
-      if (userData['aadhar_image'] != null)
+      }
+      if (userData['aadhar_image'] != null) {
         flatData[_aadharImage] = userData['aadhar_image'];
-      if (userData['nominee_name'] != null)
+      }
+      if (userData['nominee_name'] != null) {
         flatData[_nomineeName] = userData['nominee_name'];
-      if (userData['nominee_relationship'] != null)
+      }
+      if (userData['nominee_relationship'] != null) {
         flatData[_nomineeRelation] = userData['nominee_relationship'];
-      if (userData['nominee_address'] != null)
+      }
+      if (userData['nominee_address'] != null) {
         flatData[_nomineeAddress] = userData['nominee_address'];
+      }
 
       await _box.putAll(flatData);
       return true;

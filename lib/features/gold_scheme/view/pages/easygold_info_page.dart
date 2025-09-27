@@ -1,9 +1,7 @@
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rajakumari_scheme/core/models/coredata_model.dart';
 import 'package:rajakumari_scheme/core/services/auth_state_service.dart';
-import 'package:rajakumari_scheme/core/services/shared_pref_service.dart';
 import 'package:rajakumari_scheme/features/authentication/view/pages/login_with_phone_page.dart';
 import 'package:rajakumari_scheme/features/gold_scheme/view/pages/gold_schemes_page.dart';
 

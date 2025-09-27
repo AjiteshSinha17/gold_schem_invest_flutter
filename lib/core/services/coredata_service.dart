@@ -30,7 +30,7 @@ class CoreDataService {
       }
     } catch (e) {
       if (e is Map<String, dynamic>) {
-        throw e; // Already a structured error
+        rethrow; // Already a structured error
       }
       throw {
         'message': e.toString(),

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:rajakumari_scheme/core/api_secrets/api_secrets.dart';
 import 'package:rajakumari_scheme/core/config/app_config.dart';
 import 'package:rajakumari_scheme/core/controllers/store_list_controller.dart';
-import 'package:rajakumari_scheme/core/global_widgets/custom_alert_box.dart';
 import 'package:rajakumari_scheme/core/models/coredata_model.dart';
 import 'package:rajakumari_scheme/core/services/auth_state_service.dart';
 import 'package:rajakumari_scheme/features/authentication/view/pages/login_with_phone_page.dart';

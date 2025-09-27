@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rajakumari_scheme/core/constants/global_colors.dart';
 import 'package:rajakumari_scheme/features/home/models/notification_model.dart';
 import 'package:rajakumari_scheme/features/home/services/notification_service.dart';
-
+//import 'package:rajakumari_scheme/utils/app_colors.dart';
 
 class NotificationDrawer extends StatefulWidget {
   final String userId;
@@ -24,19 +25,23 @@ class _NotificationDrawerState extends State<NotificationDrawer>
   @override
   void initState() {
     super.initState();
+
+    // Animation controller for slide transition (drawer-like effect)
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
+
     _offsetAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
+      begin: const Offset(1.0, 0.0), // start off-screen (right)
+      end: Offset.zero, // slide in to normal position
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _loadNotifications();
-    _controller.forward();
+    _controller.forward(); // start animation
   }
 
+  /// Load notifications from the service
   Future<void> _loadNotifications() async {
     setState(() => loading = true);
     try {
@@ -49,8 +54,83 @@ class _NotificationDrawerState extends State<NotificationDrawer>
     }
   }
 
-  void closeDrawer() {
-    _controller.reverse().then((_) => Navigator.pop(context));
+  /// Show full notification details in a popup dialog
+  void _showNotificationDetails(NotificationData notif) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white, // full white background for dialog
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Notification Title
+                Text(
+                  notif.title.isNotEmpty ? notif.title : "Notification",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: AppColors.darkCharcoal,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Notification Message
+                Text(
+                  notif.msg,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                const SizedBox(height: 8),
+
+                // Show link only if it starts with https
+                notif.link.isNotEmpty && notif.link.startsWith("https")
+                    ? InkWell(
+                        onTap: () => debugPrint("Open link: ${notif.link}"),
+                        child: Text(
+                          notif.link,
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                const SizedBox(height: 8),
+
+                // Created At Date
+                Text(
+                  "Created At: ${DateFormat("dd MMM yyyy, hh:mm a").format(notif.createdOn)}",
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+                const SizedBox(height: 12),
+
+                // Close button
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryGold,
+                      foregroundColor: AppColors.darkCharcoal,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -58,29 +138,28 @@ class _NotificationDrawerState extends State<NotificationDrawer>
     return SlideTransition(
       position: _offsetAnimation,
       child: Scaffold(
-        backgroundColor: Colors.grey.shade100,
+        backgroundColor: AppColors.white, // ✅ Full white background
         appBar: AppBar(
           title: const Text(
             "Notifications",
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(color: AppColors.darkCharcoal, fontSize: 22),
           ),
-          backgroundColor: Colors.amberAccent,
-          elevation: 1,
+          backgroundColor: AppColors.primaryGold,
+          elevation: 4, // subtle drop shadow for contrast
           actions: [
+            // Refresh button only
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.black),
+              icon: const Icon(Icons.refresh, color: AppColors.darkCharcoal),
               onPressed: _loadNotifications,
-            ),
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.black),
-              onPressed: closeDrawer,
             ),
           ],
         ),
         body: loading
+            // Show loader when fetching
             ? const Center(
-                child: CircularProgressIndicator(color: Colors.amber),
+                child: CircularProgressIndicator(color: AppColors.primaryGold),
               )
+            // Show empty state if no notifications
             : notifications.isEmpty
                 ? const Center(
                     child: Text(
@@ -88,106 +167,83 @@ class _NotificationDrawerState extends State<NotificationDrawer>
                       style: TextStyle(color: Colors.black54, fontSize: 16),
                     ),
                   )
-                : ListView.builder(
+                // GridView for notifications
+                : Padding(
                     padding: const EdgeInsets.all(12),
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      final notif = notifications[index];
-                      return _notificationCard(notif);
-                    },
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // ✅ 2-column grid
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.1,
+                      ),
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        final notif = notifications[index];
+                        return _notificationCard(notif);
+                      },
+                    ),
                   ),
       ),
     );
   }
 
+  /// Builds each notification card (grid item)
   Widget _notificationCard(NotificationData notif) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 1),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: Card(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 6,
-          shadowColor: Colors.black26,
-          child: ExpansionTile(
-            tilePadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: CircleAvatar(
-              backgroundColor: Colors.amber.shade100,
-              child: const Icon(Icons.notifications_active, color: Colors.amber),
-            ),
-            title: Text(
-              notif.title.isNotEmpty ? notif.title : 'Notification',
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            subtitle: Text(
-              notif.msg.isNotEmpty ? notif.msg : '',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.black54),
-            ),
-            iconColor: Colors.amber,
-            collapsedIconColor: Colors.amber,
-            childrenPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return GestureDetector(
+      onTap: () => _showNotificationDetails(notif),
+      child: Card(
+        color: AppColors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 6,
+        shadowColor: Colors.black26,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _detailTile(Icons.info, "ID", notif.id),
-              _detailTile(Icons.title, "Title", notif.title),
-              _detailTile(Icons.message, "Message", notif.msg),
-              if (notif.link.isNotEmpty)
-                _detailTile(Icons.link, "Link", notif.link, isLink: true),
-              _detailTile(
-                Icons.access_time,
-                "Created At",
-                DateFormat("dd MMM yyyy, hh:mm a").format(notif.createdOn),
+              // Notification icon
+              Icon(Icons.notifications_active,
+                  color: AppColors.primaryGold, size: 36),
+
+              const SizedBox(height: 8),
+
+              // Title (single line)
+              Text(
+                notif.title.isNotEmpty ? notif.title : 'Notification',
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: AppColors.darkCharcoal,
+                ),
+              ),
+              const SizedBox(height: 4),
+
+              // Message preview (2 lines max)
+              Text(
+                notif.msg,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 13, color: Colors.black54, height: 1.3),
+              ),
+              const SizedBox(height: 6),
+
+              // Created date (short format)
+              Text(
+                DateFormat("dd MMM").format(notif.createdOn),
+                style: const TextStyle(
+                    fontSize: 12, color: AppColors.emeraldGreen),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _detailTile(IconData icon, String label, String value,
-      {bool isLink = false}) {
-    return Column(
-      children: [
-        ListTile(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(icon, color: Colors.amber, size: 22),
-          title: Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-              fontSize: 14,
-            ),
-          ),
-          subtitle: isLink
-              ? InkWell(
-                  onTap: () => debugPrint("Open link: $value"),
-                  child: Text(
-                    value,
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                )
-              : Text(
-                  value,
-                  style: const TextStyle(color: Colors.black87, fontSize: 13),
-                ),
-        ),
-        const Divider(height: 1, color: Colors.black12),
-      ],
     );
   }
 }

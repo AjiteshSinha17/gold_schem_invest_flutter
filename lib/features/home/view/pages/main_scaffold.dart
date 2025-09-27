@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
@@ -10,7 +9,6 @@ import 'package:rajakumari_scheme/core/api_secrets/api_secrets.dart';
 import 'package:rajakumari_scheme/core/config/app_config.dart';
 import 'package:rajakumari_scheme/core/controllers/coredata_controller.dart';
 import 'package:rajakumari_scheme/core/controllers/store_list_controller.dart';
-import 'package:rajakumari_scheme/core/global_widgets/custom_alert_box.dart';
 
 import 'package:rajakumari_scheme/core/models/coredata_model.dart';
 import 'package:rajakumari_scheme/core/services/auth_state_service.dart';

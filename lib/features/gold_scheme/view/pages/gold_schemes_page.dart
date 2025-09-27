@@ -4,9 +4,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:rajakumari_scheme/core/constants/global_colors.dart';
 import 'package:rajakumari_scheme/features/gold_scheme/controllers/scheme_list_controller.dart';
 import 'package:rajakumari_scheme/features/gold_scheme/models/scheme_model.dart';
 import 'package:rajakumari_scheme/features/gold_scheme/view/pages/scheme_invest_page.dart';
+// import 'package:rajakumari_scheme/theme/app_colors.dart';
 
 class GoldSchemesPage extends StatefulWidget {
   const GoldSchemesPage({super.key});
@@ -58,6 +60,7 @@ class _GoldSchemesPageState extends State<GoldSchemesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         title: const Text(
           'Our Schemes',
@@ -65,8 +68,8 @@ class _GoldSchemesPageState extends State<GoldSchemesPage> {
         ),
         centerTitle: true,
         elevation: 0.5,
-        backgroundColor: Colors.amber.shade600,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primaryGold,
+        foregroundColor: AppColors.white,
       ),
       body: _buildBody(),
     );
@@ -97,16 +100,22 @@ class _GoldSchemesPageState extends State<GoldSchemesPage> {
     return RefreshIndicator(
       onRefresh: _loadSchemes,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: _schemes.length + 1, // +1 for the warning
+        physics: const BouncingScrollPhysics(), // smooth scroll effect
+        padding: const EdgeInsets.all(20.0),
+        itemCount: _schemes.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {
-            return _buildWarningMessage(); // Add warning at the top
+            return _buildWarningMessage();
           }
-          final scheme = _schemes[index - 1]; // Shift index
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: _buildSchemeCardFromModel(scheme),
+          final scheme = _schemes[index - 1];
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOut,
+            margin: const EdgeInsets.only(bottom: 24),
+            child: GestureDetector(
+              onTap: () => _openSchemeDetails(scheme),
+              child: _buildSchemeCardFromModel(scheme),
+            ),
           );
         },
       ),
@@ -115,32 +124,44 @@ class _GoldSchemesPageState extends State<GoldSchemesPage> {
 
   Widget _buildWarningMessage() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 16),
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.amber.shade100.withOpacity(0.6),
-        border: Border.all(color: Colors.amber.shade300),
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [AppColors.primaryGold.withOpacity(0.25), AppColors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.primaryGold.withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryGold.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Icon(
-            Icons.warning_amber_rounded,
-            color: Colors.deepOrange,
-            size: 40,
+            Icons.error_outline, 
+            color: Colors.redAccent,
+            size: 50,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(height: 16),
           Text(
-            'Before you join a scheme, make sure to follow all on-screen instructions carefully.\n\n'
-            'Do NOT close the app or payment gateway unless a success or failure message is shown.\n\n'
-            'If you face any issues, avoid exiting the app abruptly.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade900,
-              fontWeight: FontWeight.w500,
-              height: 1.5,
+            'Before you join a scheme, follow all on-screen instructions carefully.\n\n'
+            'Do NOT close the app or payment gateway until a success/failure message appears.\n\n'
+            'Avoid exiting the app abruptly if issues occur.',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+              height: 1.6,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -148,168 +169,195 @@ class _GoldSchemesPageState extends State<GoldSchemesPage> {
   }
 
   Widget _buildSchemeCardFromModel(SchemeModel scheme) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.amber.withOpacity(0.3)),
-            boxShadow: [
-              BoxShadow(
-                color: const Color.fromARGB(
-                  255,
-                  247,
-                  225,
-                  159,
-                ).withOpacity(0.2),
-                blurRadius: 10,
-                offset: Offset(0, 6),
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.white.withOpacity(0.65),
+                  AppColors.metallicSilver.withOpacity(0.25),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          child: Column(
-            children: [
-              Text(
-                scheme.name.toUpperCase(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.primaryGold.withOpacity(0.5)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryGold.withOpacity(0.25),
+                  blurRadius: 14,
+                  offset: const Offset(0, 8),
                 ),
-              ),
-              const SizedBox(height: 20),
-              _buildInfoItem(
-                icon: Icons.calendar_month_outlined,
-                label: 'Duration',
-                value: '${scheme.noMonths} months',
-              ),
-              _buildInfoItem(
-                icon: Icons.payments_outlined,
-                label: 'Monthly Payment',
-                value: '₹ ${scheme.instalmentAmt}',
-              ),
-              _buildInfoItem(
-                icon: Icons.savings_outlined,
-                label: 'Total Paid',
-                value: '₹ ${scheme.totalInstalmentAmt}',
-              ),
-              _buildInfoItem(
-                icon: Icons.card_giftcard_outlined,
-                label: 'Bonus',
-                value: '₹ ${scheme.bonusAmt}',
-              ),
-              _buildInfoItem(
-                icon: Icons.account_balance_wallet_outlined,
-                label: 'Total Benefit',
-                value: '₹ ${scheme.totalAmt}',
-              ),
-              const SizedBox(height: 16),
-              _buildJoinButton(scheme),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    // Define a list of potential icon colors
-    final List<Color> iconColors = [
-      Colors.amber.shade700,
-      Colors.teal.shade600,
-      Colors.deepOrange.shade600,
-      Colors.indigo.shade600,
-      Colors.purple.shade600,
-      Colors.green.shade700,
-    ];
-
-    // Pick a random color
-    final Color randomColor = iconColors[Random().nextInt(iconColors.length)];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(flex: 1, child: Icon(icon, size: 28, color: randomColor)),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 3,
+              ],
+            ),
+            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Text(
-                  label,
+                  scheme.name.toUpperCase(),
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.darkCharcoal,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "${scheme.noMonths} months",
+                  style: const TextStyle(
+                    fontSize: 15,
                     color: Colors.black54,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 14),
                 Text(
-                  value,
+                  "₹ ${scheme.instalmentAmt}",
                   style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryGold,
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildJoinButton(SchemeModel scheme) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => SchemeInvestPage(
-                  schemeId: scheme.id,
-                  amount: scheme.instalmentAmt,
-                ),
-          ),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.amber,
-        foregroundColor: Colors.black, // Ensures good contrast on amber
-        minimumSize: const Size(100, 44),
-        elevation: 4,
-        shadowColor: Colors.amber.shade200,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+  void _openSchemeDetails(SchemeModel scheme) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _SchemeDetailsPage(scheme: scheme),
       ),
+    );
+  }
+}
 
-      child: const Text(
-        'Join',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+class _SchemeDetailsPage extends StatelessWidget {
+  final SchemeModel scheme;
+  const _SchemeDetailsPage({required this.scheme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        title: Text(scheme.name.toUpperCase()),
+        backgroundColor: AppColors.primaryGold,
+        foregroundColor: AppColors.white,
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            _infoTile(Icons.calendar_month_outlined, "Duration",
+                "${scheme.noMonths} months"),
+            _infoTile(Icons.payments_outlined, "Monthly Payment",
+                "₹ ${scheme.instalmentAmt}"),
+            _infoTile(Icons.savings_outlined, "Total Paid",
+                "₹ ${scheme.totalInstalmentAmt}"),
+            _infoTile(
+                Icons.card_giftcard_outlined, "Bonus", "₹ ${scheme.bonusAmt}"),
+            _infoTile(Icons.account_balance_wallet_outlined, "Total Benefit",
+                "₹ ${scheme.totalAmt}"),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SchemeInvestPage(
+                      schemeId: scheme.id,
+                      amount: scheme.instalmentAmt,
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                backgroundColor: AppColors.primaryGold,
+                elevation: 8,
+                shadowColor: AppColors.primaryGold.withOpacity(0.5),
+              ),
+              child: const Text(
+                "Join Scheme",
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _infoTile(IconData icon, String label, String value) {
+    final List<Color> iconColors = [
+      AppColors.primaryGold,
+      AppColors.emeraldGreen,
+      Colors.deepOrange.shade600,
+      Colors.indigo.shade600,
+    ];
+    final Color randomColor =
+        iconColors[Random().nextInt(iconColors.length)];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.white, AppColors.metallicSilver.withOpacity(0.2)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.primaryGold.withOpacity(0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryGold.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: randomColor, size: 30),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.darkCharcoal,
+            ),
+          ),
+        ],
       ),
     );
   }
